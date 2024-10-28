@@ -4,10 +4,9 @@ jQuery(function($) {
         let currentPlayer = 'X';
         let gameActive = true;
 
-        // Retrieve scores from localStorage or initialize to zero
-        let playerScore = localStorage.getItem('playerScore') ? parseInt(localStorage.getItem('playerScore')) : 0;
-        let computerScore = localStorage.getItem('computerScore') ? parseInt(localStorage.getItem('computerScore')) : 0;
-        let tieScore = localStorage.getItem('tieScore') ? parseInt(localStorage.getItem('tieScore')) : 0;
+    
+        let scores = JSON.parse(localStorage.getItem('scores')) || [0, 0, 0];
+        let [playerScore, computerScore, tieScore] = scores;
 
         const winPatterns = [
             [0, 1, 2],
@@ -24,7 +23,7 @@ jQuery(function($) {
             for (const pattern of winPatterns) {
                 const [a, b, c] = pattern;
                 if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-                    return pattern; // Return the winning pattern
+                    return pattern;
                 }
             }
             return null;
@@ -38,16 +37,13 @@ jQuery(function($) {
             $('#playerScore').text(`Your Score: ${playerScore}`);
             $('#computerScore').text(`Computer Score: ${computerScore}`);
             $('#tieScore').text(`Ties: ${tieScore}`);
-            localStorage.setItem('playerScore', playerScore);
-            localStorage.setItem('computerScore', computerScore);
-            localStorage.setItem('tieScore', tieScore);
+            localStorage.setItem('scores', JSON.stringify([playerScore, computerScore, tieScore]));
         }
 
         function handleClick(cellIndex) {
             if (gameActive && !board[cellIndex] && currentPlayer === 'X') {
                 board[cellIndex] = currentPlayer;
 
-                // Animate the move with a span wrapper
                 const cell = $(`[data-index=${cellIndex}]`);
                 cell.html(`<span>${currentPlayer}</span>`);
                 cell.css("-webkit-text-stroke", "2px red");
@@ -62,7 +58,7 @@ jQuery(function($) {
                     animateWinningSequence(winningPattern);
                 } else if (!board.includes(null)) {
                     gameActive = false;
-                    tieScore++; // Increment tie score
+                    tieScore++;
                     updateScore();
                     $('#message').text("It's a tie!");
                 } else {
@@ -74,41 +70,52 @@ jQuery(function($) {
         }
 
         function computerMove() {
-            // Check for a winning move or block player's winning move
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] === 'O' && board[b] === 'O' && board[c] === null) {
-                    makeMove(c);
-                    return;
-                } else if (board[a] === 'O' && board[c] === 'O' && board[b] === null) {
-                    makeMove(b);
-                    return;
-                } else if (board[b] === 'O' && board[c] === 'O' && board[a] === null) {
-                    makeMove(a);
-                    return;
-                }
+        
+            let bestMove = findBestMove('O');
+            if (bestMove !== null) {
+                makeMove(bestMove);
+                return;
             }
 
-            // Block player winning moves
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] === 'X' && board[b] === 'X' && board[c] === null) {
-                    makeMove(c);
-                    return;
-                } else if (board[a] === 'X' && board[c] === 'X' && board[b] === null) {
-                    makeMove(b);
-                    return;
-                } else if (board[b] === 'X' && board[c] === 'X' && board[a] === null) {
-                    makeMove(a);
-                    return;
-                }
+        
+            bestMove = findBestMove('X');
+            if (bestMove !== null) {
+                makeMove(bestMove);
+                return;
             }
 
+        
+            const center = 4;
+            const corners = [0, 2, 6, 8];
             const emptyCells = board.map((cell, index) => cell === null ? index : null).filter(index => index !== null);
-            if (emptyCells.length > 0) {
-                const cellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                makeMove(cellIndex);
+
+        
+            if (board[center] === null) {
+                makeMove(center);
+            } 
+        
+            else if (corners.some(corner => board[corner] === null)) {
+                const availableCorners = corners.filter(corner => board[corner] === null);
+                makeMove(availableCorners[Math.floor(Math.random() * availableCorners.length)]);
+            } 
+        
+            else {
+                makeMove(emptyCells[Math.floor(Math.random() * emptyCells.length)]);
             }
+        }
+
+        function findBestMove(player) {
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (
+                    (board[a] === player && board[b] === player && board[c] === null) ||
+                    (board[a] === player && board[b] === null && board[c] === player) ||
+                    (board[a] === null && board[b] === player && board[c] === player)
+                ) {
+                    return [a, b, c].find(index => board[index] === null);
+                }
+            }
+            return null;
         }
 
         function makeMove(cellIndex) {
@@ -128,6 +135,8 @@ jQuery(function($) {
                 animateWinningSequence(winningPattern);
             } else if (!board.includes(null)) {
                 gameActive = false;
+                tieScore++;
+                updateScore();
                 $('#message').text("It's a tie!");
             } else {
                 currentPlayer = 'X';
@@ -137,7 +146,6 @@ jQuery(function($) {
 
         function animateWinningSequence(winningPattern) {
             const winningCells = winningPattern.map(index => $(`[data-index=${index}]`).find('span'));
-            console.log(winningCells);
             gsap.fromTo(
                 winningCells,
                 { scale: 1 },
@@ -147,6 +155,7 @@ jQuery(function($) {
                     yoyo: true,
                     repeat: 3,
                     ease: "power2.easeOut",
+                    stagger: 0.15
                 }
             );
         }
