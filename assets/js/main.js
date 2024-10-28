@@ -1,7 +1,7 @@
 jQuery(function($) {
     $(document).ready(function () {
         let board = Array(9).fill(null);
-        let currentPlayer = 'X'; // Player
+        let currentPlayer = 'X';
         let gameActive = true;
 
         // Retrieve scores from localStorage or initialize to zero
@@ -36,7 +36,6 @@ jQuery(function($) {
         function updateScore() {
             $('#playerScore').text(`Your Score: ${playerScore}`);
             $('#computerScore').text(`Computer Score: ${computerScore}`);
-            // Save scores to localStorage
             localStorage.setItem('playerScore', playerScore);
             localStorage.setItem('computerScore', computerScore);
         }
@@ -45,16 +44,16 @@ jQuery(function($) {
             if (gameActive && !board[cellIndex] && currentPlayer === 'X') {
                 board[cellIndex] = currentPlayer;
 
-                // Animate the move
+                // Animate the move with a span wrapper
                 const cell = $(`[data-index=${cellIndex}]`);
-                cell.text(currentPlayer);
-                cell.css("-webkit-text-stroke", "1px red");
-                gsap.fromTo(cell, { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
+                cell.html(`<span>${currentPlayer}</span>`);
+                cell.css("-webkit-text-stroke", "2px red");
+                gsap.fromTo(cell.find('span'), { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
 
                 const winningPattern = checkWin();
                 if (winningPattern) {
                     gameActive = false;
-                    playerScore++; // Increment player score
+                    playerScore++;
                     updateScore();
                     updateMessage();
                     animateWinningSequence(winningPattern);
@@ -62,15 +61,15 @@ jQuery(function($) {
                     gameActive = false;
                     $('#message').text("It's a tie!");
                 } else {
-                    currentPlayer = 'O'; // Switch to computer
+                    currentPlayer = 'O';
                     updateMessage();
-                    computerMove(); // Computer makes a move
+                    setTimeout(computerMove, 1000);
                 }
             }
         }
 
         function computerMove() {
-            // Check for a winning move
+            // Check for a winning move or block player's winning move
             for (const pattern of winPatterns) {
                 const [a, b, c] = pattern;
                 if (board[a] === 'O' && board[b] === 'O' && board[c] === null) {
@@ -85,7 +84,7 @@ jQuery(function($) {
                 }
             }
 
-            // Check to block the player from winning
+            // Block player winning moves
             for (const pattern of winPatterns) {
                 const [a, b, c] = pattern;
                 if (board[a] === 'X' && board[b] === 'X' && board[c] === null) {
@@ -100,7 +99,6 @@ jQuery(function($) {
                 }
             }
 
-            // If no winning/blocking move, choose a random empty cell
             const emptyCells = board.map((cell, index) => cell === null ? index : null).filter(index => index !== null);
             if (emptyCells.length > 0) {
                 const cellIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
@@ -111,16 +109,15 @@ jQuery(function($) {
         function makeMove(cellIndex) {
             board[cellIndex] = currentPlayer;
 
-            // Animate the move
             const cell = $(`[data-index=${cellIndex}]`);
-            cell.text(currentPlayer);
-            cell.css("-webkit-text-stroke", "1px white");
-            gsap.fromTo(cell, { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
+            cell.html(`<span>${currentPlayer}</span>`);
+            cell.css("-webkit-text-stroke", "2px white");
+            gsap.fromTo(cell.find('span'), { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
 
             const winningPattern = checkWin();
             if (winningPattern) {
                 gameActive = false;
-                computerScore++; // Increment computer score
+                computerScore++;
                 updateScore();
                 updateMessage();
                 animateWinningSequence(winningPattern);
@@ -128,13 +125,14 @@ jQuery(function($) {
                 gameActive = false;
                 $('#message').text("It's a tie!");
             } else {
-                currentPlayer = 'X'; // Switch back to player
+                currentPlayer = 'X';
                 updateMessage();
             }
         }
 
         function animateWinningSequence(winningPattern) {
-            const winningCells = winningPattern.map(index => $(`[data-index=${index}]`));
+            const winningCells = winningPattern.map(index => $(`[data-index=${index}]`).find('span'));
+            console.log(winningCells);
             gsap.fromTo(
                 winningCells,
                 { scale: 1 },
@@ -154,24 +152,19 @@ jQuery(function($) {
         });
 
         $('#reset').on('click', function () {
-            // Stop any active GSAP animations
             gsap.killTweensOf(".cell");
             gsap.killTweensOf("#message");
 
             board = Array(9).fill(null);
             currentPlayer = 'X';
             gameActive = true;
-            $('.cell').text('').removeAttr('style');
+            $('.cell').html('').removeAttr('style');
             $('#message').text("Your turn");
 
-            // Animate the reset button
             gsap.fromTo('#reset', { scale: 1 }, { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" });
-
-            // Animate clearing of cells
             gsap.fromTo('.cell', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.05 });
         });
 
-        // Initialize score display
         updateScore();
         $('#message').text("Your turn");
     });
