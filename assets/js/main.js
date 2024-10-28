@@ -7,6 +7,7 @@ jQuery(function($) {
         // Retrieve scores from localStorage or initialize to zero
         let playerScore = localStorage.getItem('playerScore') ? parseInt(localStorage.getItem('playerScore')) : 0;
         let computerScore = localStorage.getItem('computerScore') ? parseInt(localStorage.getItem('computerScore')) : 0;
+        let tieScore = localStorage.getItem('tieScore') ? parseInt(localStorage.getItem('tieScore')) : 0;
 
         const winPatterns = [
             [0, 1, 2],
@@ -36,8 +37,10 @@ jQuery(function($) {
         function updateScore() {
             $('#playerScore').text(`Your Score: ${playerScore}`);
             $('#computerScore').text(`Computer Score: ${computerScore}`);
+            $('#tieScore').text(`Ties: ${tieScore}`);
             localStorage.setItem('playerScore', playerScore);
             localStorage.setItem('computerScore', computerScore);
+            localStorage.setItem('tieScore', tieScore);
         }
 
         function handleClick(cellIndex) {
@@ -59,6 +62,8 @@ jQuery(function($) {
                     animateWinningSequence(winningPattern);
                 } else if (!board.includes(null)) {
                     gameActive = false;
+                    tieScore++; // Increment tie score
+                    updateScore();
                     $('#message').text("It's a tie!");
                 } else {
                     currentPlayer = 'O';
