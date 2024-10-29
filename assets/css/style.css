@@ -11,7 +11,7 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #0b0b0b;
+    background-color: #fff;
 }
 
 .game-board {
@@ -19,14 +19,74 @@ body {
 }
 
 h1 {
-    color: #fff;
+    color: #0b0b0b;
 }
 
 #board {
+    /* grid-gap: 10px; */
+    margin: 50px auto;
+}
+
+.board {
+    position: relative;
+}
+
+.board-cells {
     display: grid;
     grid-template-columns: repeat(3, 100px);
-    grid-gap: 10px;
-    margin: 20px auto;
+    position: relative;
+}
+
+.board-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.board-line--horizontal {
+    span {
+        display: block;
+        position: absolute;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background-color: #0b0b0b;
+        transform: scale(0);
+        transform-origin: top;
+    }
+
+    span:first-child {
+        left: 33.33%;
+    }
+    
+    span:last-child {
+        left: 66.66%;
+        transform-origin: bottom;
+    }
+}
+
+.board-line--vertical {
+    span {
+        display: block;
+        position: absolute;
+        left: 0;
+        height: 2px;
+        width: 100%;
+        background-color: #0b0b0b;
+        transform: scale(0);
+        transform-origin: left;
+    }
+
+    span:first-child {
+        top: 33.33%;
+    }
+    
+    span:last-child {
+        top: 66.66%;
+        transform-origin: right;
+    }
 }
 
 .cell {
@@ -37,7 +97,7 @@ h1 {
     align-items: center;
     font-size: 2em;
     color: #555;
-    border: 2px solid #fff;
+    /* border: 2px solid #0b0b0b; */
     cursor: pointer;
     font-size: 80px;
     font-weight: bold;
@@ -54,13 +114,13 @@ h1 {
 
 #message {
     font-size: 1.2em;
-    color: #fff;
+    color: #0b0b0b;
     margin-top: 20px;
 }
 
 
 .scoreboard {
     font-size: 1.2em;
-    color: #fff;
+    color: #0b0b0b;
     margin-top: 50px;
 }

@@ -12,16 +12,26 @@
 <body>
     <div class="game-board">
         <h1>Tic Tac Toe</h1>
-        <div id="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
+        <div id="board" class="board">
+            <div class="board-line board-line--horizontal">
+                <span></span>
+                <span></span>
+            </div>
+            <div class="board-line board-line--vertical">
+                <span></span>
+                <span></span>
+            </div>
+            <div class="board-cells">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
         </div>
         <button id="reset">Reset Game</button>
         <p id="message"></p>

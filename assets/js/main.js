@@ -46,7 +46,7 @@ jQuery(function($) {
 
                 const cell = $(`[data-index=${cellIndex}]`);
                 cell.html(`<span>${currentPlayer}</span>`);
-                cell.css("-webkit-text-stroke", "2px red");
+                cell.css("-webkit-text-stroke", "2px #0b0b0b");
                 gsap.fromTo(cell.find('span'), { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
 
                 const winningPattern = checkWin();
@@ -123,7 +123,7 @@ jQuery(function($) {
 
             const cell = $(`[data-index=${cellIndex}]`);
             cell.html(`<span>${currentPlayer}</span>`);
-            cell.css("-webkit-text-stroke", "2px white");
+            cell.css("-webkit-text-stroke", "2px red");
             gsap.fromTo(cell.find('span'), { scale: 0 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.5)" });
 
             const winningPattern = checkWin();
@@ -167,6 +167,8 @@ jQuery(function($) {
 
         $('#reset').on('click', function () {
             gsap.killTweensOf(".cell");
+            gsap.killTweensOf(".board-line--horizontal > span");
+            gsap.killTweensOf(".board-line--vertical > span");
             gsap.killTweensOf("#message");
 
             board = Array(9).fill(null);
@@ -176,10 +178,14 @@ jQuery(function($) {
             $('#message').text("Your turn");
 
             gsap.fromTo('#reset', { scale: 1 }, { scale: 1.1, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" });
-            gsap.fromTo('.cell', { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.05 });
+            gsap.fromTo('.board-line--horizontal > span', { scale: 0 }, { scale: 1, duration: 0.55, stagger: 0.1 });
+            gsap.fromTo('.board-line--vertical > span', { scale: 0 }, { scale: 1, duration: 0.55, stagger: 0.1 });
         });
 
         updateScore();
         $('#message').text("Your turn");
+
+        gsap.fromTo('.board-line--horizontal > span', { scale: 0 }, { scale: 1, duration: 0.55, stagger: 0.1 });
+        gsap.fromTo('.board-line--vertical > span', { scale: 0 }, { scale: 1, duration: 0.55, stagger: 0.1 });
     });
 });
